@@ -13,13 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 1
       - run: |
-          git submodule update --init
           git lfs install
           git lfs pull
       
       - name: Install dep
-        run: apt update && sudo apt install libpulse-dev libglvnd-dev libx11-dev libopenal-dev libvulkan-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libgtk-3-dev ninja-build
+        run: sudo apt update && sudo apt install libpulse-dev libglvnd-dev libx11-dev libopenal-dev libvulkan-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libgtk-3-dev ninja-build
         
       - name: Build
         run: python3 build.py
@@ -43,14 +45,15 @@ jobs:
     runs-on: vs2017-win2016
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 1
       - run: |
-         git submodule update --init
          git lfs install
          git lfs pull
         
       - name: Build
         run: python build.py
-        shell: cmd
 
       - name: Prepare deploy
         shell: bash
