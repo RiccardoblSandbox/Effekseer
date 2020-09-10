@@ -7,8 +7,37 @@ on:
     branches:
       - master
       - 15x
-jobs:
+jobs:     
+  linux:
+    name: linux Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git submodule update --init
+          git lfs install
+          git lfs pull
+      
+      - name: Install dep
+        run: apt update && sudo apt install libpulse-dev libglvnd-dev libx11-dev libopenal-dev libvulkan-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libgtk-3-dev ninja-build
+        
+      - name: Build
+        run: python3 build.py
+      
+      - name: Prepare deploy
+        run: |
+          cp -Rvf Release/Sample Dev/release/
+          cp -Rvf ResourceData/samples/* Dev/release/Sample/
+          cp readme_* Dev/release/
+          cp -Rvf docs/ Dev/release/
+          
+      - name: Upload all
+        uses: actions/upload-artifact@v1
+        with:
+          name: EffekseerLinux
+          path: Dev/release
 
+        
   windows:
     name: windows Build
     runs-on: vs2017-win2016
@@ -23,38 +52,22 @@ jobs:
         run: python build.py
         shell: cmd
 
-      - name: Test
+      - name: Prepare deploy
+        shell: bash
         run: |
-         cd build/Dev/Cpp/Test/Release/
-         Test.exe ci
-        shell: cmd
-
-      - name: Upload Test
+          cp -Rvf Release/Sample Dev/release/
+          cp -Rvf ResourceData/samples/* Dev/release/Sample/
+          cp readme_* Dev/release/
+          cp -Rvf docs/ Dev/release/
+          
+                
+      - name: Upload all
         uses: actions/upload-artifact@v1
         with:
-          name: Test
-          path: build/Dev/Cpp/Test/Release/
+          name: EffekseerWindows
+          path: Dev/release
+          
+          
 
-      - name: Test
-        run: python Script/test_screenshot.py
-        shell: cmd
-
-      - name: Release Runtime
-        run: release_runtime.bat
-        shell: cmd
-
-      - name: Upload Runtime
-        uses: actions/upload-artifact@v1
-        with:
-          name: EffekseerRuntime152g
-          path: EffekseerRuntime150
-
-      - name: Release Tool
-        run: release_tool.bat
-        shell: cmd
-
-      - name: Upload Tool
-        uses: actions/upload-artifact@v1
-        with:
-          name: Effekseer152gWin
-          path: Effekseer150Win
+                    
+      
