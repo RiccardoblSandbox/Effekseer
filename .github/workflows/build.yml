@@ -14,12 +14,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        name: [linux,windows]
+        name: [linux,windows,mac]
         include:
           - name: linux
             os: ubuntu-latest
           - name: windows
             os: vs2017-win2016
+          - name: mac
+            os: macos-latest 
     name: Build on ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,10 +33,6 @@ jobs:
           git lfs install
           git lfs pull
       
-      - name: Setup MSBuild.exe
-        if: matrix.name == 'windows'
-        uses: warrenbuckley/Setup-MSBuild@v1
-        
       - name: Install Linux Dependencies
         if: matrix.name == 'linux'
         run: |
@@ -49,7 +47,14 @@ jobs:
         
       - name: Build
         shell: bash
-        run: python3 build.py || python build.py
+        run: |
+          if [ "${{ matrix.name }}" = "mac" ];
+          then
+              export PACKAGEING_FOR_MAC=1 
+              export MONO_SDK_PATH=/Library/Frameworks/Mono.framework/Versions/5_18_1
+          fi
+          python3 build.py || python build.py
+          
       
       - name: Prepare Runtime
         if: matrix.name == 'windows'
@@ -88,12 +93,27 @@ jobs:
         with:
           name: Effekseer-${{matrix.name}}
           path: EffekseerTool
+        
+      - name: Upload Mac Tool
+        if: matrix.name == 'mac'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Effekseer-${{matrix.name}}
+          path: EffekseerMac
           
+      - name: Upload Mac Tool (dmg)
+        if: matrix.name == 'mac'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Effekseer-${{matrix.name}}.dmg
+          path: Dev/Effekseer.dmg
+  
   Deploy:
     if: github.event_name == 'release'
     needs: [Build]
     runs-on: ubuntu-latest
     steps:
+     
       - uses: actions/download-artifact@v2
         with:
           name: Effekseer-windows
@@ -110,11 +130,21 @@ jobs:
           name: EffekseerRuntime
           path: EffekseerRuntime.zip
       
+      - uses: actions/download-artifact@v2
+        with:
+          name: Effekseer-mac.dmg
+          path: EffekseerMac.dmg
+                  
+      - uses: actions/download-artifact@v2
+        with:
+          name: Effekseer-mac
+          path: EffekseerMac.zip   
+      
       - name: Deploy to github releases    
         run: |
           releaseId=$(jq --raw-output '.release.id' ${GITHUB_EVENT_PATH})
           echo "Upload to release $releaseId"
-          filename="$(ls *.zip)"
+          filename="$(ls *.zip *.dmg)"
           url="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/$releaseId/assets?name=$(basename $filename)"
           echo "Upload to $url"
           curl -L \
