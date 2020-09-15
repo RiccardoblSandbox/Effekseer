@@ -38,6 +38,8 @@ mkdir -p $RDIR/Tool
 
 cp -v Dev/release/Effekseer.exe $RDIR/Tool/. || cp -v Dev/release/Effekseer $RDIR/Tool/.
 cp -v Dev/release/Effekseer.exe.config $RDIR/Tool/. || cp -v Dev/release/Effekseer.config $RDIR/Tool/. || true
+cp -v Dev/release/Effekseer.dll $RDIR/Tool/. || true
+cp -v Dev/release/Effekseer.dll.config $RDIR/Tool/.  || true
 cp -v Dev/release/EffekseerCore.dll $RDIR/Tool/.
 cp -v Dev/release/EffekseerViewer.dll $RDIR/Tool/. || true
 cp -v Dev/release/IronPython.dll $RDIR/Tool/.
