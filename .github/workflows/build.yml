@@ -41,9 +41,11 @@ jobs:
                xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
         
       - name: Build
-        run: python3 build.py
+        shell: bash
+        run: python3 build.py || python build.py
       
       - name: Prepare deploy
+        shell: bash
         run: |
           mkdir dist
           cp -Rvf Dev/release/*/publish/* dist/
