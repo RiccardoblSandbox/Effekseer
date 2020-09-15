@@ -34,10 +34,7 @@ echo Compile Editor
 
 echo Copy application
 
-mkdir -p $RDIR/Tool
-
-
-cp -v Dev/release/* $RDIR/Tool/.
+cp -Rv Dev/release $RDIR/Tool
 rm -R $RDIR/Tool/linux-x64 || true
 rm -R $RDIR/Tool/publish || true
 
