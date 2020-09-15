@@ -11,12 +11,12 @@ jobs:
   BuildTool:
     strategy:
       matrix:
-        os: [ubuntu-latest,windows-latest]
+        name: [linux,windows]
         include:
-          - os: ubuntu-latest
-            name: "linux"
-          - os: windows-latest
-            name: "windows"
+          - name: linux
+            os: ubuntu-latest
+          - name: windows
+            os: vs2017-win2016
     name: Build on ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
