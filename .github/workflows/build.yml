@@ -28,6 +28,10 @@ jobs:
           git lfs install
           git lfs pull
       
+      - name: Setup MSBuild.exe
+        if: matrix.name == 'windows'
+        uses: warrenbuckley/Setup-MSBuild@v1
+        
       - name: Install Linux Dependencies
         if: matrix.name == 'linux'
         run: |
@@ -44,16 +48,31 @@ jobs:
         shell: bash
         run: python3 build.py || python build.py
       
-      - name: Prepare deploy
-        shell: bash
+      - name: Prepare Windows Runtime
+        if: matrix.name == 'windows'
         run: |
-          mkdir dist
-          cp -Rvf Dev/release/*/publish/* dist/
-          
-      - name: Upload Release
-        uses: actions/upload-artifact@v1
+          release_runtime.bat
+          move EffekseerRuntime* EffekseerRuntime
+        shell: cmd
+
+      - name: Prepare Windows Tool
+        run: |
+          release_tool.bat
+          move Effekseer*Win EffekseerTool
+        if: matrix.name == 'windows'
+        shell: cmd
+        
+      - name: Upload Runtime
+        uses: actions/upload-artifact@v2
         with:
-          name: Effekseer-${{ matrix.name }}
-          path: dist
+          name: EffekseerRuntime-${{matrix.name}}
+          path: EffekseerRuntime
+
+      - name: Upload Tool
+        uses: actions/upload-artifact@v2
+        with:
+          name: Effekseer-${{matrix.name}}
+          path: EffekseerTool
+          
 
         
