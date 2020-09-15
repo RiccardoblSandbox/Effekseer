@@ -8,9 +8,17 @@ on:
       - master
       - 15x
 jobs:     
-  linux:
-    name: linux Build
-    runs-on: ubuntu-latest
+  BuildTool:
+    strategy:
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+        include:
+          - os: ubuntu-latest
+            name: "linux"
+          - os: windows-latest
+            name: "windows"
+    name: Build on ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -20,57 +28,30 @@ jobs:
           git lfs install
           git lfs pull
       
-      - name: Install dep
-        run: sudo apt update && sudo apt install libpulse-dev libglvnd-dev libx11-dev libopenal-dev libvulkan-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libgtk-3-dev ninja-build
+      - name: Install Linux Dependencies
+        if: matrix.name == 'linux'
+        run: |
+          wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg
+          sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+          wget -q https://packages.microsoft.com/config/ubuntu/18.04/prod.list 
+          sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update
+          sudo apt-get install -y  libpulse-dev libglvnd-dev libx11-dev libopenal-dev libvulkan-dev \
+               libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libgtk-3-dev ninja-build dotnet-sdk-3.1 \
+               xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev
         
       - name: Build
         run: python3 build.py
       
       - name: Prepare deploy
         run: |
-          cp -Rvf Release/Sample Dev/release/
-          cp -Rvf ResourceData/samples/* Dev/release/Sample/
-          cp readme_* Dev/release/
-          cp -Rvf docs/ Dev/release/
+          mkdir dist
+          cp -Rvf Dev/release/*/publish/* dist/
           
-      - name: Upload all
+      - name: Upload Release
         uses: actions/upload-artifact@v1
         with:
-          name: EffekseerLinux
-          path: Dev/release
+          name: Effekseer-${{ matrix.name }}
+          path: dist
 
         
-  windows:
-    name: windows Build
-    runs-on: vs2017-win2016
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-          fetch-depth: 1
-      - run: |
-         git lfs install
-         git lfs pull
-        
-      - name: Build
-        run: python build.py
-
-      - name: Prepare deploy
-        shell: bash
-        run: |
-          cp -Rvf Release/Sample Dev/release/
-          cp -Rvf ResourceData/samples/* Dev/release/Sample/
-          cp readme_* Dev/release/
-          cp -Rvf docs/ Dev/release/
-          
-                
-      - name: Upload all
-        uses: actions/upload-artifact@v1
-        with:
-          name: EffekseerWindows
-          path: Dev/release
-          
-          
-
-                    
-      
