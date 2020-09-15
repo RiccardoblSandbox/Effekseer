@@ -36,38 +36,10 @@ echo Copy application
 
 mkdir -p $RDIR/Tool
 
-cp -v Dev/release/Effekseer.exe $RDIR/Tool/. || cp -v Dev/release/Effekseer $RDIR/Tool/.
-cp -v Dev/release/Effekseer.exe.config $RDIR/Tool/. || cp -v Dev/release/Effekseer.config $RDIR/Tool/. || true
-cp -v Dev/release/Effekseer.dll $RDIR/Tool/. || true
-cp -v Dev/release/Effekseer.dll.config $RDIR/Tool/.  || true
-cp -v Dev/release/EffekseerCore.dll $RDIR/Tool/.
-cp -v Dev/release/EffekseerViewer.dll $RDIR/Tool/. || true
-cp -v Dev/release/IronPython.dll $RDIR/Tool/.
-cp -v Dev/release/IronPython.Modules.dll $RDIR/Tool/.
-cp -v Dev/release/Microsoft.Dynamic.dll $RDIR/Tool/.
-cp -v Dev/release/Microsoft.Scripting.dll $RDIR/Tool/.
-cp -v Dev/release/EffekseerMaterialEditor$EXE_EXT $RDIR/Tool/.
-cp -v Dev/release/Viewer.dll $RDIR/Tool/. || true
-cp -v Dev/release/Newtonsoft.Json.dll $RDIR/Tool/.
 
-
-mkdir -p $RDIR/Tool/scripts
-mkdir -p $RDIR/Tool/scripts/export
-cp -v Dev/release/scripts/export/Default.cs $RDIR/Tool/scripts/export/.
-
-mkdir -p $RDIR/Tool/tools
-cp -v Dev/release/tools/fbxToEffekseerModelConverter.exe $RDIR/Tool/tools/. || true
-cp -v Dev/release/tools/mqoToEffekseerModelConverter.exe $RDIR/Tool/tools/.|| true
-
-cp -v Dev/release/tools/EffekseerMaterialCompilerDX9.dll $RDIR/Tool/tools/.|| true
-cp -v Dev/release/tools/EffekseerMaterialCompilerDX11.dll $RDIR/Tool/tools/. || true
-cp -v Dev/release/tools/EffekseerMaterialCompilerDX12.dll $RDIR/Tool/tools/.|| true
-cp -v Dev/release/tools/EffekseerMaterialCompilerGL.dll $RDIR/Tool/tools/. || cp -v Dev/release/tools/libEffekseerMaterialCompilerGL.so $RDIR/Tool/tools/.
-cp -v Dev/release/tools/EffekseerMaterialCompilerMetal.dll $RDIR/Tool/tools/.|| cp -v Dev/release/tools/libEffekseerMaterialCompilerMetal.so $RDIR/Tool/tools/.
-
-
-mkdir -p $RDIR/Tool/resources
-robocopy Dev/release/resources/ $RDIR/Tool/resources/. /s
+cp -v Dev/release/* $RDIR/Tool/.
+rm -R $RDIR/Tool/linux-x64 || true
+rm -R $RDIR/Tool/publish || true
 
 echo Sample
 
